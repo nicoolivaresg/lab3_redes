@@ -16,11 +16,25 @@ def save_image(image, name):
 def normailize_image(image):
 	return image / 255
 
+
+def fix_bounds(image, offset):
+	n, m = image.shape
+	average = image.mean()
+	newImage = np.full((n + 2*offset, m + 2*offset), average)
+	for i in range(0, n):
+		for j in range(0, m):
+			newImage[i + offset, j + offset] = image[i, j]
+
+	return newImage
+
 def convolve_2D(origin_signal, kernel):
-	n,m = kernel.shape
-	r,s = origin_signal.shape
 	# Asumiendo kernel cuadrados
+	n,m = kernel.shape
 	offset = int(n/2)
+
+	origin_signal = fix_bounds(origin_signal, offset)
+
+	r,s = origin_signal.shape
 	g = np.zeros((r - 2*offset, s - 2*offset))
 	for k in range(0+offset,r-offset):
 		for l in range(0+offset,s-offset):
@@ -42,5 +56,5 @@ def process_image(path):
 	save_image(result_gauss,"gauss")
 	save_image(result_boundary,"boundary")
 
-process_image("img.png")
+process_image("leena512.bmp")
 
