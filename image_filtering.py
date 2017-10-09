@@ -25,25 +25,28 @@ def read_image(path):
 # Entrada:
 #	image		- Datos de la imagen que es guardada.
 #	name 		- Nombre del archivo que se guarda.
+#	title		- Titulo del grafico.
 #	transform	- Indica si la imagen a guardar es una imagen (matriz de pixeles) o
 #				una transformada de fourier 2d de una imagen (transform = True). 
 #
-def save_image(image, name, transform = False):
+def save_image(image, name, transform = False, title = None):
 	if transform != True:
 		imsave(name,image,'png')
 	else:		
+		if title == None:
+			title = name
 		real = np.log(np.abs(image)+1)
 		(height,width) = real.shape
 		plt.figure(figsize=(10,10*height/width),facecolor='white')
 		plt.clf()
-		plt.title(name, fontsize = 28)
+		plt.title(title, fontsize = 28)
 		plt.rc('text',usetex=False)
 		plt.xlabel(r'$\omega_1$',fontsize=18)
 		plt.ylabel(r'$\omega_2$',fontsize=18)
 		plt.xticks(fontsize=16)
 		plt.yticks(fontsize=16)
 		plt.imshow( real, cmap='Greys_r',extent=[-pi,pi,-pi,pi],aspect='auto')
-		plt.savefig(name)
+		plt.savefig(name, bbox_inches='tight')
 
 
 # Normaliza una matriz de pixeles en escala de grises (imagen) a valores entre 0 y 1.
@@ -142,7 +145,7 @@ def process_image(path):
 
 	#Transformadada de fourier de señal original
 	original_fft = ftransform(image)
-	save_image(original_fft, "original_fft", transform = True)
+	save_image(original_fft, "original_fft", title = "Transformada de fourier de la señal original", transform = True)
 
 	#Transformadada de fourier  inversa de señal orginal transformada
 	#original_ifft = iftransform(original_fft)
@@ -153,23 +156,23 @@ def process_image(path):
 	kernel_gauss = (1/256)*np.asarray([[1,4,6,4,1],[4,16,24,16,4],[6,24,36,24,6],[4,16,24,16,4],[1,4,6,4,1]])
 
 	# Transformada de fourier de los filtros
-	fft_kernel_boundary_detector = ftransform(kernel_boundary_detector)
-	fft_kernel_gauss = ftransform(kernel_gauss)
+	kernel_boundary_detector_fft = ftransform(kernel_boundary_detector)
+	kernel_gauss_fft = ftransform(kernel_gauss)
 
-	save_image(fft_kernel_boundary_detector, "fft_kernel_boundary_detector", transform = True)
-	save_image(fft_kernel_gauss, "fft_kernel_gauss", transform = True)
+	save_image(kernel_boundary_detector_fft, "kernel_boundary_detector_fft", title = "Transformada del kernel detector de bordes", transform = True)
+	save_image(kernel_gauss_fft, "kernel_gauss_fft", title = "Transformada del kernel gaussiano", transform = True)
 
 	#Aplicación de convolución
 	result_gauss = convolve_2D(image,kernel_gauss)
 	result_boundary = convolve_2D(image,kernel_boundary_detector)
-	save_image(result_gauss,"gauss", transform = False)
-	save_image(result_boundary,"boundary", transform = False)
+	save_image(result_gauss,"lena_gauss", transform = False)
+	save_image(result_boundary,"lena_boundary", transform = False)
 
 	#Aplicación de transformada de fourier de dos dimensiones
 	gauss_fft = ftransform(result_gauss)
 	boundary_fft = ftransform(result_boundary)
-	save_image(gauss_fft,"gauss_fft", transform = True)
-	save_image(boundary_fft, "boundary_fft", transform = True)
+	save_image(gauss_fft,"gauss_fft", title = "Transformada de la imagen filtrada", transform = True)
+	save_image(boundary_fft, "boundary_fft", title = "Transformada de la imagen filtrada", transform = True)
 
 	#Transformadada de fourier  inversa de señal con gauss transformada
 	#gauss_ifft = iftransform(gauss_fft)
