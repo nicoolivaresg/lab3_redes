@@ -1,7 +1,8 @@
 from scipy.ndimage import imread
 from scipy.misc import imsave
+from scipy.fftpack import fft2, ifft2, fftshift
+from math import pi
 import numpy as np
-from scipy.fftpack import fft2, ifft2
 import matplotlib.pyplot as plt
 
 
@@ -10,8 +11,22 @@ def read_image(path):
 	return imagen
 
 
-def save_image(image, name):
-	imsave(name,image,'png')
+def save_image(image, name, transform = False):
+	if transform != True:
+		imsave(name,image,'png')
+	else:		
+		real = np.log(np.abs(image)+1)
+		(height,width) = real.shape
+		plt.figure(figsize=(10,10*height/width),facecolor='white')
+		plt.clf()
+		plt.title(name, fontsize = 28)
+		plt.rc('text',usetex=False)
+		plt.xlabel(r'$\omega_1$',fontsize=18)
+		plt.ylabel(r'$\omega_2$',fontsize=18)
+		plt.xticks(fontsize=16)
+		plt.yticks(fontsize=16)
+		plt.imshow( real, cmap='Greys_r',extent=[-pi,pi,-pi,pi],aspect='auto')
+		plt.savefig(name)
 
 
 
@@ -33,10 +48,12 @@ def fix_bounds(image, offset):
 
 def ftransform(image):
 	image_transformation = fft2(image, axes = (0,0))
-	return np.absolute(image_transformation)
+	image_transformation = fftshift(image_transformation)
+	return image_transformation
 
 
 def convolve_2D(origin_signal, kernel):
+	print("Aplicando filtro...")
 	# Asumiendo kernel cuadrados
 	n,m = kernel.shape
 	#Este offser indica la cantidad de pixeles extra que necesita la imagen para soportar las características del kernel
@@ -57,6 +74,7 @@ def convolve_2D(origin_signal, kernel):
 					lOff = l - offset
 					g[kOff,lOff] = g[kOff,lOff] + origin_signal[kOff+i,lOff+j]*kernel[i,j]
 
+	print("Filtrado finalizado")
 	return g
 
 def process_image(path):
@@ -65,7 +83,7 @@ def process_image(path):
 
 	#Transformadada de fourier de señal original
 	original_fft = ftransform(image)
-	save_image(original_fft, "original_fft")
+	save_image(original_fft, "original_fft", transform = True)
 
 	#Transformadada de fourier  inversa de señal orginal transformada
 	#original_ifft = iftransform(original_fft)
@@ -78,14 +96,14 @@ def process_image(path):
 	#Aplicación de convolución
 	result_gauss = convolve_2D(image,kernel_gauss)
 	result_boundary = convolve_2D(image,kernel_boundary_detector)
-	save_image(result_gauss,"gauss")
-	save_image(result_boundary,"boundary")
+	save_image(result_gauss,"gauss", transform = False)
+	save_image(result_boundary,"boundary", transform = False)
 
 	#Aplicación de transformada de fourier de dos dimensiones
 	gauss_fft = ftransform(result_gauss)
 	boundary_fft = ftransform(result_boundary)
-	save_image(gauss_fft,"gauss_fft")
-	save_image(boundary_fft, "boundary_fft")
+	save_image(gauss_fft,"gauss_fft", transform = True)
+	save_image(boundary_fft, "boundary_fft", transform = True)
 
 	#Transformadada de fourier  inversa de señal con gauss transformada
 	#gauss_ifft = iftransform(gauss_fft)
@@ -95,8 +113,7 @@ def process_image(path):
 	#boundary_ifft = iftransform(boundary_fft)
 	#save_image(boundary_ifft, "boundary_ifft")
 
-	plt.show()
-
+	
 ##PROCESAMIENTO	
 process_image("leena512.bmp")
 
