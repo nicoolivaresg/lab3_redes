@@ -153,11 +153,11 @@ def process_image(path):
 	kernel_gauss = (1/256)*np.asarray([[1,4,6,4,1],[4,16,24,16,4],[6,24,36,24,6],[4,16,24,16,4],[1,4,6,4,1]])
 
 	# Transformada de fourier de los filtros
-	fft_boundary_detector = ftransform(kernel_boundary_detector)
-	fft_gauss = ftransform(kernel_gauss)
+	fft_kernel_boundary_detector = ftransform(kernel_boundary_detector)
+	fft_kernel_gauss = ftransform(kernel_gauss)
 
-	save_image(fft_boundary_detector, "fft_boundary_detector", transform = True)
-	save_image(fft_gauss, "fft_gauss", transform = True)
+	save_image(fft_kernel_boundary_detector, "fft_kernel_boundary_detector", transform = True)
+	save_image(fft_kernel_gauss, "fft_kernel_gauss", transform = True)
 
 	#Aplicación de convolución
 	result_gauss = convolve_2D(image,kernel_gauss)
