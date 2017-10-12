@@ -6,6 +6,11 @@ from math import pi
 import numpy as np
 import matplotlib.pyplot as plt
 
+####### Constantes y variables globales #######
+
+XLABEL = "ciclos/pixel"
+YLABEL = "ciclos/pixel"
+
 ########## Definición de Funciones ############
 
 # Obtiene la imagen que se encuentra en la ruta especificada (en escala de grises).
@@ -39,10 +44,10 @@ def save_image(image, name, transform = False, title = None):
 		(height,width) = real.shape
 		plt.figure(figsize=(10,10*height/width),facecolor='white')
 		plt.clf()
-		plt.title(title, fontsize = 28)
+		plt.title(title, fontsize = 26)
 		plt.rc('text',usetex=False)
-		plt.xlabel(r'$\omega_1$',fontsize=18)
-		plt.ylabel(r'$\omega_2$',fontsize=18)
+		plt.xlabel(XLABEL,fontsize=18)
+		plt.ylabel(YLABEL,fontsize=18)
 		plt.xticks(fontsize=16)
 		plt.yticks(fontsize=16)
 		plt.imshow( real, cmap='Greys_r',extent=[-pi,pi,-pi,pi],aspect='auto')
